@@ -1,12 +1,14 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { ActivePage } from './types'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { TrackerProvider } from './contexts/TrackerContext'
+import { FavoritesProvider, useFavorites } from './contexts/FavoritesContext'
 import { Navigation } from './components/Navigation'
 import { RecipesPage } from './pages/RecipesPage'
 import { TrackerPage } from './pages/TrackerPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { LoginPage } from './pages/LoginPage'
+import { Heart } from 'lucide-react'
 
 function LoadingScreen() {
   return (
@@ -26,6 +28,51 @@ function LoadingScreen() {
   )
 }
 
+// ── Favorites toast — rendered once at app level ──────────────────────────────
+
+function FavoriteToastDisplay() {
+  const { toast, clearToast } = useFavorites()
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    if (!toast) { setVisible(false); return }
+    setVisible(true)
+    const timer = setTimeout(clearToast, toast.liked ? 2000 : 1500)
+    return () => clearTimeout(timer)
+  }, [toast, clearToast])
+
+  if (!toast || !visible) return null
+
+  return (
+    <div
+      className="fixed bottom-24 md:bottom-6 left-1/2 z-[101] flex items-center gap-2.5 font-nunito font-semibold text-sm shadow-modal fav-toast-enter"
+      style={{
+        transform: 'translateX(-50%)',
+        backgroundColor: toast.liked ? '#FAECE7' : '#FFFFFF',
+        color: toast.liked ? '#2C2420' : '#8A7D74',
+        border: toast.liked ? '2px solid #E8713A' : '2px solid #E8DDD3',
+        padding: '10px 20px',
+        borderRadius: '50px',
+        maxWidth: '320px',
+        whiteSpace: 'nowrap',
+      }}
+      role="status"
+      aria-live="polite"
+    >
+      <Heart
+        size={15}
+        strokeWidth={2.5}
+        fill={toast.liked ? '#E8713A' : 'none'}
+        color={toast.liked ? '#E8713A' : '#8A7D74'}
+        aria-hidden="true"
+      />
+      <span>{toast.liked ? 'Ajouté aux favoris !' : 'Retiré des favoris'}</span>
+    </div>
+  )
+}
+
+// ── App content ───────────────────────────────────────────────────────────────
+
 function AppContent() {
   const { user, loading } = useAuth()
   const [activePage, setActivePage] = useState<ActivePage>('recettes')
@@ -35,13 +82,17 @@ function AppContent() {
 
   return (
     <TrackerProvider>
-      <div className="min-h-screen" style={{ backgroundColor: '#FFF9F3' }}>
-        <Navigation activePage={activePage} onNavigate={setActivePage} />
+      <FavoritesProvider>
+        <div className="min-h-screen" style={{ backgroundColor: '#FFF9F3' }}>
+          <Navigation activePage={activePage} onNavigate={setActivePage} />
 
-        {activePage === 'recettes' && <RecipesPage />}
-        {activePage === 'tracker' && <TrackerPage />}
-        {activePage === 'dashboard' && <DashboardPage />}
-      </div>
+          {activePage === 'recettes' && <RecipesPage />}
+          {activePage === 'tracker' && <TrackerPage />}
+          {activePage === 'dashboard' && <DashboardPage onNavigate={setActivePage} />}
+
+          <FavoriteToastDisplay />
+        </div>
+      </FavoritesProvider>
     </TrackerProvider>
   )
 }

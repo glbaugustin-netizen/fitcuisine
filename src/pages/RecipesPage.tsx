@@ -4,6 +4,7 @@ import { recipes } from '../data/recipes'
 import { FilterBar } from '../components/FilterBar'
 import { RecipeCard } from '../components/RecipeCard'
 import { RecipeDetail } from '../components/RecipeDetail'
+import { useFavorites } from '../contexts/FavoritesContext'
 
 const defaultFilters: FilterState = {
   search: '',
@@ -11,6 +12,7 @@ const defaultFilters: FilterState = {
   category: 'tous',
   mainIngredient: 'tous',
   sort: 'default',
+  showFavoritesOnly: false,
 }
 
 function useDebounce<T>(value: T, delay: number): T {
@@ -35,6 +37,7 @@ function useIsMobile() {
 export function RecipesPage() {
   const [filters, setFilters] = useState<FilterState>(defaultFilters)
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null)
+  const { isFavorite, favoritesCount } = useFavorites()
   const isMobile = useIsMobile()
   const gridRef = useRef<HTMLDivElement>(null)
 
@@ -46,6 +49,11 @@ export function RecipesPage() {
 
   const filtered = useMemo(() => {
     let result = [...recipes]
+
+    // Favorites first (reduces set before other filters)
+    if (filters.showFavoritesOnly) {
+      result = result.filter((r) => isFavorite(r.id))
+    }
 
     // Search
     if (debouncedSearch.trim()) {
@@ -90,9 +98,16 @@ export function RecipesPage() {
     }
 
     return result
-  }, [debouncedSearch, filters.objective, filters.category, filters.mainIngredient, filters.sort])
+  }, [debouncedSearch, filters.objective, filters.category, filters.mainIngredient, filters.sort, filters.showFavoritesOnly, isFavorite])
 
   const closeDetail = useCallback(() => setSelectedRecipe(null), [])
+
+  // Empty state messaging
+  const emptyIsFavoritesWithNoFavs = filters.showFavoritesOnly && favoritesCount === 0
+  const emptyTitle = emptyIsFavoritesWithNoFavs ? 'Aucun favori pour l\'instant' : 'Aucune recette trouvée'
+  const emptySubtext = emptyIsFavoritesWithNoFavs
+    ? 'Clique sur le cœur d\'une recette pour la retrouver ici.'
+    : 'Essaie de modifier tes filtres ou ta recherche'
 
   return (
     <main className="max-w-container mx-auto px-4 md:px-6 py-6 pb-24 md:pb-8">
@@ -121,10 +136,10 @@ export function RecipesPage() {
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 gap-3">
             <span className="font-fredoka font-semibold text-text-secondary text-xl">
-              Aucune recette trouvée
+              {emptyTitle}
             </span>
             <p className="font-nunito text-text-muted text-sm text-center max-w-xs">
-              Essaie de modifier tes filtres ou ta recherche
+              {emptySubtext}
             </p>
             <button
               onClick={() => setFilters(defaultFilters)}
@@ -137,9 +152,7 @@ export function RecipesPage() {
         ) : (
           <div
             className="grid gap-5"
-            style={{
-              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-            }}
+            style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}
           >
             {filtered.map((recipe, index) => (
               <RecipeCard

@@ -44,6 +44,15 @@
   background: #B5A99E;
 }
 
+/* Favorites toast slide-up animation */
+@keyframes fav-slide-up {
+  from { opacity: 0; transform: translate(-50%, 12px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+.fav-toast-enter {
+  animation: fav-slide-up 0.25s ease forwards;
+}
+
 /* Horizontal scroll for filter chips on mobile */
 .filter-scroll {
   overflow-x: auto;

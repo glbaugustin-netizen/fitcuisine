@@ -3,6 +3,7 @@ import type { Recipe } from '../types'
 import { MacroPill } from './MacroPill'
 import { RecipeIllustration } from './illustrations'
 import { recipeIllustrations } from '../data/illustrations'
+import { FavoriteButton } from './FavoriteButton'
 
 interface RecipeCardProps {
   recipe: Recipe
@@ -48,7 +49,7 @@ export function RecipeCard({ recipe, index, onClick }: RecipeCardProps) {
       role="button"
       aria-label={`Voir la recette ${recipe.name}`}
     >
-      {/* Illustration zone — 55% height */}
+      {/* Illustration zone */}
       <div
         className="relative flex items-center justify-center"
         style={{
@@ -57,12 +58,14 @@ export function RecipeCard({ recipe, index, onClick }: RecipeCardProps) {
           borderBottom: '2px solid #E8DDD3',
         }}
       >
-        <RecipeIllustration
-          illustrationKey={illustrationKey}
-          className="w-28 h-28"
-        />
+        <RecipeIllustration illustrationKey={illustrationKey} className="w-28 h-28" />
 
-        {/* Objective badge */}
+        {/* Favorite button — top left */}
+        <div className="absolute top-2.5 left-2.5 z-10">
+          <FavoriteButton recipeId={recipe.id} size="sm" />
+        </div>
+
+        {/* Objective badge — top right */}
         <span
           className="absolute top-3 right-3 flex items-center gap-1 font-nunito font-bold border-2 border-border-strong"
           style={{
@@ -85,12 +88,10 @@ export function RecipeCard({ recipe, index, onClick }: RecipeCardProps) {
 
       {/* Card body */}
       <div className="p-3.5">
-        {/* Name */}
         <h3 className="font-fredoka font-semibold text-text-primary leading-snug mb-1.5" style={{ fontSize: '15px' }}>
           {recipe.name}
         </h3>
 
-        {/* Meta info */}
         <div className="flex items-center gap-2 mb-3" style={{ color: '#8A7D74' }}>
           <span className="flex items-center gap-1 font-nunito font-semibold" style={{ fontSize: '12px' }}>
             <Clock size={13} strokeWidth={2} aria-hidden="true" />
@@ -104,7 +105,6 @@ export function RecipeCard({ recipe, index, onClick }: RecipeCardProps) {
           </span>
         </div>
 
-        {/* Macro pills */}
         <div className="flex flex-wrap gap-1.5">
           <MacroPill type="calories" value={recipe.macros.calories} />
           <MacroPill type="protein" value={recipe.macros.protein} />

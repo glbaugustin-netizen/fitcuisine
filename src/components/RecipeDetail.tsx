@@ -4,6 +4,7 @@ import type { Recipe, MealType, TrackerEntry } from '../types'
 import { RecipeIllustration } from './illustrations'
 import { recipeIllustrations } from '../data/illustrations'
 import { MacroPill } from './MacroPill'
+import { FavoriteButton } from './FavoriteButton'
 import { useTracker } from '../contexts/TrackerContext'
 import { todayStr } from '../utils/date'
 import { Toast } from './Toast'
@@ -124,7 +125,10 @@ export function RecipeDetail({ recipe, onClose, isMobile }: RecipeDetailProps) {
         <div className="p-5 md:p-6 space-y-5">
           {/* Title */}
           <div>
-            <h2 className="font-fredoka font-semibold text-text-primary text-2xl leading-tight mb-2">{recipe.name}</h2>
+            <div className="flex items-start justify-between gap-3 mb-2">
+              <h2 className="font-fredoka font-semibold text-text-primary text-2xl leading-tight">{recipe.name}</h2>
+              <FavoriteButton recipeId={recipe.id} size="md" />
+            </div>
             <div className="flex flex-wrap items-center gap-2 text-text-secondary">
               <span className="flex items-center gap-1 font-nunito font-semibold text-sm">
                 <Clock size={15} strokeWidth={2} aria-hidden="true" />{recipe.prepTime} min

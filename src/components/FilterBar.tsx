@@ -1,5 +1,6 @@
-import { Search, SlidersHorizontal, Dumbbell, Leaf, X } from 'lucide-react'
+import { Search, SlidersHorizontal, Dumbbell, Leaf, X, Heart } from 'lucide-react'
 import type { FilterState, RecipeObjective, RecipeCategory, MainIngredient, SortOption } from '../types'
+import { useFavorites } from '../contexts/FavoritesContext'
 
 interface FilterBarProps {
   filters: FilterState
@@ -73,15 +74,18 @@ const sortOptions: { value: SortOption; label: string }[] = [
 ]
 
 export function FilterBar({ filters, onChange, totalCount, filteredCount }: FilterBarProps) {
+  const { favoritesCount } = useFavorites()
+
   const hasActiveFilters =
     filters.objective !== 'tous' ||
     filters.category !== 'tous' ||
     filters.mainIngredient !== 'tous' ||
     filters.sort !== 'default' ||
-    filters.search !== ''
+    filters.search !== '' ||
+    filters.showFavoritesOnly
 
   function resetAll() {
-    onChange({ objective: 'tous', category: 'tous', mainIngredient: 'tous', sort: 'default', search: '' })
+    onChange({ objective: 'tous', category: 'tous', mainIngredient: 'tous', sort: 'default', search: '', showFavoritesOnly: false })
   }
 
   return (
@@ -146,6 +150,33 @@ export function FilterBar({ filters, onChange, totalCount, filteredCount }: Filt
               </Chip>
             )
           })}
+        </div>
+      </div>
+
+      {/* Favoris filter */}
+      <div>
+        <p
+          className="font-nunito font-semibold mb-2 uppercase tracking-wider"
+          style={{ fontSize: '11px', color: '#8A7D74', letterSpacing: '0.5px' }}
+        >
+          Sélection
+        </p>
+        <div className="filter-scroll flex items-center gap-2 pb-1">
+          <Chip
+            active={filters.showFavoritesOnly}
+            onClick={() => onChange({ showFavoritesOnly: !filters.showFavoritesOnly })}
+            aria-label="Afficher uniquement les favoris"
+            activeStyle={{ backgroundColor: '#FAECE7', color: '#E8713A', border: '2px solid #E8713A' }}
+          >
+            <Heart
+              size={13}
+              strokeWidth={2.5}
+              fill={filters.showFavoritesOnly ? '#E8713A' : 'none'}
+              color={filters.showFavoritesOnly ? '#E8713A' : '#8A7D74'}
+              aria-hidden="true"
+            />
+            Favoris{favoritesCount > 0 ? ` (${favoritesCount})` : ''}
+          </Chip>
         </div>
       </div>
 

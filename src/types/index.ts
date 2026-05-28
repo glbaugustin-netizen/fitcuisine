@@ -38,6 +38,7 @@ export interface FilterState {
   category: RecipeCategory | 'tous'
   mainIngredient: MainIngredient | 'tous'
   sort: SortOption
+  showFavoritesOnly: boolean
 }
 
 // ── Tracker ──────────────────────────────────────────────────────────────────
