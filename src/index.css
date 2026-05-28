@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Nunito', sans-serif;
+  }
+
+  body {
+    background-color: #FFF9F3;
+    color: #2C2420;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+}
+
+@layer utilities {
+  .font-fredoka {
+    font-family: 'Fredoka', sans-serif;
+  }
+
+  .font-nunito {
+    font-family: 'Nunito', sans-serif;
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #FFF9F3;
+}
+::-webkit-scrollbar-thumb {
+  background: #E8DDD3;
+  border-radius: 50px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #B5A99E;
+}
+
+/* Horizontal scroll for filter chips on mobile */
+.filter-scroll {
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.filter-scroll::-webkit-scrollbar {
+  display: none;
+}
