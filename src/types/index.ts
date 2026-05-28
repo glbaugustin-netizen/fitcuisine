@@ -1,6 +1,6 @@
 export type RecipeCategory = 'petit-dejeuner' | 'dejeuner' | 'diner' | 'snack'
 export type RecipeObjective = 'masse' | 'seche'
-export type MainIngredient = 'poulet' | 'boeuf' | 'poisson' | 'oeufs' | 'vegetarien' | 'crevettes' | 'dinde'
+export type MainIngredient = 'poulet' | 'boeuf' | 'poisson' | 'oeufs' | 'vegetarien' | 'crevettes' | 'dinde' | 'porc'
 
 export interface Ingredient {
   name: string

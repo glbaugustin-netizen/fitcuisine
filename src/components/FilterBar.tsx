@@ -60,6 +60,7 @@ const ingredients: { value: MainIngredient | 'tous'; label: string }[] = [
   { value: 'oeufs', label: 'Œufs' },
   { value: 'vegetarien', label: 'Végétarien' },
   { value: 'dinde', label: 'Dinde' },
+  { value: 'porc', label: 'Porc' },
   { value: 'crevettes', label: 'Crevettes' },
 ]
 
