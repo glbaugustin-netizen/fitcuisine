@@ -1,36 +1,88 @@
-import { BarChart3 } from 'lucide-react'
+import { useState, useCallback } from 'react'
+import type { MealType, TrackerEntry } from '../types'
+import { useTracker } from '../contexts/TrackerContext'
+import { DateSelector } from '../components/DateSelector'
+import { DaySummary } from '../components/DaySummary'
+import { MealSlot } from '../components/MealSlot'
+import { AddFoodModal } from '../components/AddFoodModal'
+import { Toast } from '../components/Toast'
+
+const MEAL_LABELS: Record<MealType, string> = {
+  breakfast: 'Petit-déjeuner',
+  lunch:     'Déjeuner',
+  dinner:    'Dîner',
+  snack:     'Snack',
+}
+
+const MEAL_ORDER: MealType[] = ['breakfast', 'lunch', 'dinner', 'snack']
 
 export function TrackerPage() {
+  const { state, addEntry, removeEntry, setSelectedDate, getDayTotals } = useTracker()
+  const [modalMeal, setModalMeal] = useState<MealType | null>(null)
+  const [toast, setToast] = useState<string | null>(null)
+
+  const date = state.selectedDate
+  const journal = state.journals[date]
+  const totals = getDayTotals(date)
+
+  const getMealEntries = (meal: MealType): TrackerEntry[] =>
+    journal?.meals[meal] ?? []
+
+  const handleAdd = useCallback((entry: TrackerEntry) => {
+    if (!modalMeal) return
+    addEntry(date, modalMeal, entry)
+    setToast(`Ajouté au ${MEAL_LABELS[modalMeal]} !`)
+    setModalMeal(null)
+  }, [modalMeal, date, addEntry])
+
+  const handleRemove = useCallback((meal: MealType, entryId: string) => {
+    removeEntry(date, meal, entryId)
+  }, [date, removeEntry])
+
   return (
-    <main className="max-w-container mx-auto px-4 md:px-6 py-6 pb-24 md:pb-8">
-      <div className="mb-6">
+    <main className="max-w-container mx-auto px-4 md:px-6 py-6 pb-28 md:pb-10 space-y-5">
+
+      <div>
         <h1 className="font-fredoka font-semibold text-text-primary mb-1" style={{ fontSize: '28px' }}>
           Tracker
         </h1>
+        <p className="font-nunito text-text-secondary text-sm">
+          Suis tes macros jour par jour
+        </p>
       </div>
-      <div
-        className="flex flex-col items-center justify-center gap-5 rounded-card border-2 border-border-default py-20"
-        style={{ backgroundColor: '#FFF5ED' }}
-      >
-        <div
-          className="w-20 h-20 rounded-full border-2 border-border-strong flex items-center justify-center"
-          style={{ backgroundColor: '#FAEEDA' }}
-        >
-          <BarChart3 size={38} strokeWidth={2} className="text-primary" aria-hidden="true" />
-        </div>
-        <div className="text-center">
-          <h2 className="font-fredoka font-semibold text-text-primary text-2xl mb-2">Bientôt disponible</h2>
-          <p className="font-nunito text-text-secondary text-sm max-w-xs mx-auto leading-relaxed">
-            Le tracker de calories avec recherche d'aliments via OpenFoodFacts arrivera dans l'étape 2.
-          </p>
-        </div>
-        <span
-          className="font-nunito font-bold text-xs border-2 border-border-strong text-white"
-          style={{ backgroundColor: '#E8713A', borderRadius: '50px', padding: '6px 16px' }}
-        >
-          Étape 2
-        </span>
+
+      <DateSelector date={date} onChange={setSelectedDate} />
+
+      <DaySummary
+        calories={totals.calories}
+        protein={totals.protein}
+        carbs={totals.carbs}
+        fat={totals.fat}
+        profile={state.profile}
+      />
+
+      <div className="space-y-4">
+        {MEAL_ORDER.map((meal) => (
+          <MealSlot
+            key={meal}
+            mealType={meal}
+            entries={getMealEntries(meal)}
+            onAdd={() => setModalMeal(meal)}
+            onRemove={(id) => handleRemove(meal, id)}
+          />
+        ))}
       </div>
+
+      {modalMeal && (
+        <AddFoodModal
+          mealType={modalMeal}
+          mealLabel={MEAL_LABELS[modalMeal]}
+          onClose={() => setModalMeal(null)}
+          onAdd={handleAdd}
+        />
+      )}
+
+      {toast && <Toast message={toast} onClose={() => setToast(null)} />}
     </main>
   )
 }

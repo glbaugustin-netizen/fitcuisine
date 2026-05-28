@@ -31,3 +31,5 @@ Thumbs.db
 # Temp
 vite.log
 vite.err
+
+.vercel

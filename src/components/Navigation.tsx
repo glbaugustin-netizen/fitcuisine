@@ -1,5 +1,6 @@
 import { UtensilsCrossed, BarChart3, Target } from 'lucide-react'
 import type { ActivePage } from '../types'
+import { UserAvatar } from './UserAvatar'
 
 interface NavigationProps {
   activePage: ActivePage
@@ -24,9 +25,9 @@ function CoachAvocatSVG() {
 }
 
 const navItems: { id: ActivePage; label: string; Icon: typeof UtensilsCrossed; shortLabel: string }[] = [
-  { id: 'recettes', label: 'Recettes', shortLabel: 'Recettes', Icon: UtensilsCrossed },
-  { id: 'tracker', label: 'Tracker', shortLabel: 'Tracker', Icon: BarChart3 },
-  { id: 'dashboard', label: 'Dashboard', shortLabel: 'Dashboard', Icon: Target },
+  { id: 'recettes',   label: 'Recettes',   shortLabel: 'Recettes',   Icon: UtensilsCrossed },
+  { id: 'tracker',    label: 'Tracker',    shortLabel: 'Tracker',    Icon: BarChart3 },
+  { id: 'dashboard',  label: 'Dashboard',  shortLabel: 'Dashboard',  Icon: Target },
 ]
 
 export function Navigation({ activePage, onNavigate }: NavigationProps) {
@@ -38,32 +39,17 @@ export function Navigation({ activePage, onNavigate }: NavigationProps) {
         style={{ backgroundColor: '#FFF5ED' }}
         aria-label="Navigation principale"
       >
-        {/* Logo + Mascot */}
-        <button
-          className="flex items-center gap-2 select-none"
-          onClick={() => onNavigate('recettes')}
-          aria-label="Accueil FitCuisine"
-        >
+        <button className="flex items-center gap-2 select-none" onClick={() => onNavigate('recettes')} aria-label="Accueil FitCuisine">
           <CoachAvocatSVG />
-          <span className="font-fredoka text-2xl font-semibold text-text-primary leading-none">
-            FitCuisine
-          </span>
+          <span className="font-fredoka text-2xl font-semibold text-text-primary leading-none">FitCuisine</span>
         </button>
 
-        {/* Tabs */}
-        <div
-          className="flex items-center gap-1 p-1 rounded-nav"
-          style={{ backgroundColor: '#F0E8DF' }}
-          role="tablist"
-          aria-label="Sections"
-        >
+        <div className="flex items-center gap-1 p-1 rounded-nav" style={{ backgroundColor: '#F0E8DF' }} role="tablist" aria-label="Sections">
           {navItems.map(({ id, label, Icon }) => {
             const isActive = activePage === id
             return (
               <button
-                key={id}
-                role="tab"
-                aria-selected={isActive}
+                key={id} role="tab" aria-selected={isActive}
                 onClick={() => onNavigate(id)}
                 className={[
                   'flex items-center gap-2 px-4 py-2 rounded-nav font-nunito font-semibold text-sm transition-all duration-200',
@@ -79,14 +65,7 @@ export function Navigation({ activePage, onNavigate }: NavigationProps) {
           })}
         </div>
 
-        {/* User avatar */}
-        <div
-          className="w-9 h-9 rounded-full bg-primary border-2 border-border-strong flex items-center justify-center select-none"
-          aria-label="Profil utilisateur"
-          role="img"
-        >
-          <span className="font-fredoka font-semibold text-white text-sm leading-none">A</span>
-        </div>
+        <UserAvatar />
       </nav>
 
       {/* Bottom bar — mobile */}
@@ -108,18 +87,8 @@ export function Navigation({ activePage, onNavigate }: NavigationProps) {
                 isActive ? 'text-primary' : 'text-text-secondary',
               ].join(' ')}
             >
-              <div
-                className={[
-                  'p-1.5 rounded-nav transition-all duration-200',
-                  isActive ? 'bg-primary-light border-2 border-border-strong' : '',
-                ].join(' ')}
-              >
-                <Icon
-                  size={22}
-                  strokeWidth={2}
-                  aria-hidden="true"
-                  className={isActive ? 'text-primary' : 'text-text-secondary'}
-                />
+              <div className={['p-1.5 rounded-nav transition-all duration-200', isActive ? 'bg-primary-light border-2 border-border-strong' : ''].join(' ')}>
+                <Icon size={22} strokeWidth={2} aria-hidden="true" className={isActive ? 'text-primary' : 'text-text-secondary'} />
               </div>
               <span>{shortLabel}</span>
             </button>

@@ -30,7 +30,6 @@ export interface Recipe {
 }
 
 export type ActivePage = 'recettes' | 'tracker' | 'dashboard'
-
 export type SortOption = 'default' | 'time-asc' | 'time-desc' | 'calories-asc' | 'calories-desc'
 
 export interface FilterState {
@@ -39,4 +38,57 @@ export interface FilterState {
   category: RecipeCategory | 'tous'
   mainIngredient: MainIngredient | 'tous'
   sort: SortOption
+}
+
+// ── Tracker ──────────────────────────────────────────────────────────────────
+
+export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack'
+
+export interface TrackerEntry {
+  id: string
+  name: string
+  brand?: string
+  quantity: number  // en grammes
+  calories: number
+  protein: number
+  carbs: number
+  fat: number
+  source: 'openfoodfacts' | 'recipe'
+  recipeId?: string
+}
+
+export interface DayJournal {
+  date: string  // 'YYYY-MM-DD'
+  meals: Record<MealType, TrackerEntry[]>
+}
+
+// ── Profil utilisateur ───────────────────────────────────────────────────────
+
+export type ActivityLevel = 'sedentaire' | 'modere' | 'actif' | 'tres-actif'
+
+export interface UserProfile {
+  sex: 'homme' | 'femme'
+  age: number
+  height: number   // cm
+  weight: number   // kg
+  activityLevel: ActivityLevel
+  goal: 'masse' | 'seche'
+  targetCalories?: number
+  targetProtein?: number
+  targetCarbs?: number
+  targetFat?: number
+}
+
+export interface CalorieGoal {
+  mb: number
+  totalExpenditure: number
+  targetCalories: number
+  targetProtein: number
+  targetCarbs: number
+  targetFat: number
+}
+
+export interface WeightEntry {
+  date: string
+  value: number
 }

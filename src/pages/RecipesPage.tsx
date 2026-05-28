@@ -4,7 +4,6 @@ import { recipes } from '../data/recipes'
 import { FilterBar } from '../components/FilterBar'
 import { RecipeCard } from '../components/RecipeCard'
 import { RecipeDetail } from '../components/RecipeDetail'
-import { Toast } from '../components/Toast'
 
 const defaultFilters: FilterState = {
   search: '',
@@ -36,7 +35,6 @@ function useIsMobile() {
 export function RecipesPage() {
   const [filters, setFilters] = useState<FilterState>(defaultFilters)
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null)
-  const [toast, setToast] = useState<string | null>(null)
   const isMobile = useIsMobile()
   const gridRef = useRef<HTMLDivElement>(null)
 
@@ -94,13 +92,7 @@ export function RecipesPage() {
     return result
   }, [debouncedSearch, filters.objective, filters.category, filters.mainIngredient, filters.sort])
 
-  const handleAddToTracker = useCallback(() => {
-    setSelectedRecipe(null)
-    setToast('Bientôt disponible - le tracker arrive dans la prochaine étape !')
-  }, [])
-
   const closeDetail = useCallback(() => setSelectedRecipe(null), [])
-  const closeToast = useCallback(() => setToast(null), [])
 
   return (
     <main className="max-w-container mx-auto px-4 md:px-6 py-6 pb-24 md:pb-8">
@@ -166,13 +158,9 @@ export function RecipesPage() {
         <RecipeDetail
           recipe={selectedRecipe}
           onClose={closeDetail}
-          onAddToTracker={handleAddToTracker}
           isMobile={isMobile}
         />
       )}
-
-      {/* Toast notification */}
-      {toast && <Toast message={toast} onClose={closeToast} />}
     </main>
   )
 }
