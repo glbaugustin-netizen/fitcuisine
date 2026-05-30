@@ -1,12 +1,16 @@
 import { Search, SlidersHorizontal, Dumbbell, Leaf, X, Heart } from 'lucide-react'
 import type { FilterState, RecipeObjective, RecipeCategory, MainIngredient, SortOption } from '../types'
 import { useFavorites } from '../contexts/FavoritesContext'
+import { dishTypes } from '../data/dishTypes'
+import { CategoryIcon } from './CategoryIcon'
 
 interface FilterBarProps {
   filters: FilterState
   onChange: (filters: Partial<FilterState>) => void
   totalCount: number
   filteredCount: number
+  /** IDs des dishTypes présents dans les recettes filtrées courantes */
+  availableDishTypes?: string[]
 }
 
 interface ChipProps {
@@ -73,7 +77,7 @@ const sortOptions: { value: SortOption; label: string }[] = [
   { value: 'calories-desc', label: 'Calories décroissantes' },
 ]
 
-export function FilterBar({ filters, onChange, totalCount, filteredCount }: FilterBarProps) {
+export function FilterBar({ filters, onChange, totalCount, filteredCount, availableDishTypes }: FilterBarProps) {
   const { favoritesCount } = useFavorites()
 
   const hasActiveFilters =
@@ -82,10 +86,11 @@ export function FilterBar({ filters, onChange, totalCount, filteredCount }: Filt
     filters.mainIngredient !== 'tous' ||
     filters.sort !== 'default' ||
     filters.search !== '' ||
-    filters.showFavoritesOnly
+    filters.showFavoritesOnly ||
+    filters.dishType !== 'tous'
 
   function resetAll() {
-    onChange({ objective: 'tous', category: 'tous', mainIngredient: 'tous', sort: 'default', search: '', showFavoritesOnly: false })
+    onChange({ objective: 'tous', category: 'tous', mainIngredient: 'tous', sort: 'default', search: '', showFavoritesOnly: false, dishType: 'tous' })
   }
 
   return (
@@ -179,6 +184,45 @@ export function FilterBar({ filters, onChange, totalCount, filteredCount }: Filt
           </Chip>
         </div>
       </div>
+
+      {/* Dish type filter */}
+      {availableDishTypes && availableDishTypes.length > 0 && (
+        <div>
+          <p
+            className="font-nunito font-semibold mb-2 uppercase tracking-wider"
+            style={{ fontSize: '11px', color: '#8A7D74', letterSpacing: '0.5px' }}
+          >
+            Type de plat
+          </p>
+          <div className="filter-scroll flex items-center gap-2 pb-1">
+            {dishTypes
+              .filter((dt) => availableDishTypes.includes(dt.id))
+              .map((dt) => {
+                const active = filters.dishType === dt.id
+                return (
+                  <button
+                    key={dt.id}
+                    onClick={() => onChange({ dishType: active ? 'tous' : dt.id })}
+                    aria-pressed={active}
+                    aria-label={`Filtrer par type de plat : ${dt.label}`}
+                    className="flex-shrink-0 flex items-center gap-1.5 font-nunito font-semibold transition-all duration-150 active:scale-95"
+                    style={{
+                      borderRadius: '50px',
+                      padding: '6px 14px 6px 8px',
+                      fontSize: '13px',
+                      border: active ? '2px solid #2C2420' : '2px solid #E8DDD3',
+                      backgroundColor: active ? '#FAEEDA' : 'white',
+                      color: active ? '#2C2420' : '#8A7D74',
+                    }}
+                  >
+                    <CategoryIcon categoryId={dt.id} size={22} />
+                    {dt.label}
+                  </button>
+                )
+              })}
+          </div>
+        </div>
+      )}
 
       {/* Type + Ingredient + Sort row */}
       <div className="space-y-3">

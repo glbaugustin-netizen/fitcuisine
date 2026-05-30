@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import type { Recipe, FilterState } from '../types'
 import { recipes } from '../data/recipes'
+import { dishTypeMap } from '../data/dishTypes'
 import { FilterBar } from '../components/FilterBar'
 import { RecipeCard } from '../components/RecipeCard'
 import { RecipeDetail } from '../components/RecipeDetail'
@@ -13,6 +14,7 @@ const defaultFilters: FilterState = {
   mainIngredient: 'tous',
   sort: 'default',
   showFavoritesOnly: false,
+  dishType: 'tous',
 }
 
 function useDebounce<T>(value: T, delay: number): T {
@@ -81,6 +83,11 @@ export function RecipesPage() {
       result = result.filter((r) => r.mainIngredient === filters.mainIngredient)
     }
 
+    // Dish type
+    if (filters.dishType !== 'tous') {
+      result = result.filter((r) => dishTypeMap[r.id] === filters.dishType)
+    }
+
     // Sort
     switch (filters.sort) {
       case 'time-asc':
@@ -98,7 +105,34 @@ export function RecipesPage() {
     }
 
     return result
-  }, [debouncedSearch, filters.objective, filters.category, filters.mainIngredient, filters.sort, filters.showFavoritesOnly, isFavorite])
+  }, [debouncedSearch, filters.objective, filters.category, filters.mainIngredient, filters.sort, filters.showFavoritesOnly, filters.dishType, isFavorite])
+
+  // Compute available dish types from the pre-dishType-filtered set (so chips don't disappear mid-filter)
+  const availableDishTypes = useMemo(() => {
+    let base = [...recipes]
+    if (filters.showFavoritesOnly) base = base.filter((r) => isFavorite(r.id))
+    if (debouncedSearch.trim()) {
+      const q = debouncedSearch.toLowerCase().trim()
+      base = base.filter((r) =>
+        r.name.toLowerCase().includes(q) ||
+        r.mainIngredient.toLowerCase().includes(q) ||
+        r.ingredients.some((ing) => ing.name.toLowerCase().includes(q))
+      )
+    }
+    if (filters.objective !== 'tous') base = base.filter((r) => r.objective === filters.objective)
+    if (filters.category !== 'tous') base = base.filter((r) => r.category === filters.category)
+    if (filters.mainIngredient !== 'tous') base = base.filter((r) => r.mainIngredient === filters.mainIngredient)
+    const seen = new Set<string>()
+    const counts: Record<string, number> = {}
+    for (const r of base) {
+      const dt = dishTypeMap[r.id]
+      if (dt) {
+        counts[dt] = (counts[dt] ?? 0) + 1
+        seen.add(dt)
+      }
+    }
+    return [...seen].sort((a, b) => (counts[b] ?? 0) - (counts[a] ?? 0))
+  }, [debouncedSearch, filters.objective, filters.category, filters.mainIngredient, filters.showFavoritesOnly, isFavorite])
 
   const closeDetail = useCallback(() => setSelectedRecipe(null), [])
 
@@ -128,6 +162,7 @@ export function RecipesPage() {
           onChange={handleFilterChange}
           totalCount={recipes.length}
           filteredCount={filtered.length}
+          availableDishTypes={availableDishTypes}
         />
       </section>
 

@@ -1,0 +1,10 @@
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#2C2420" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+  <defs><clipPath id="triS2"><path d="M16 44 L48 44 L48 16 Z"/></clipPath></defs>
+  <g clip-path="url(#triS2)">
+    <rect x="8" y="38" width="46" height="8" fill="#E8B44A"/>
+    <rect x="8" y="32" width="46" height="6" fill="#7BC74D"/>
+    <rect x="8" y="26" width="46" height="6" fill="#F0A0B0"/>
+    <rect x="8" y="14" width="46" height="12" fill="#E8B44A"/>
+  </g>
+  <path d="M16 44 L48 44 L48 16 Z" fill="none" stroke="#2C2420" stroke-width="2.5"/>
+</svg>

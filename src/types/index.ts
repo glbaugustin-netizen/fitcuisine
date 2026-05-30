@@ -39,6 +39,7 @@ export interface FilterState {
   mainIngredient: MainIngredient | 'tous'
   sort: SortOption
   showFavoritesOnly: boolean
+  dishType: string | 'tous'
 }
 
 // ── Tracker ──────────────────────────────────────────────────────────────────
